@@ -8,7 +8,7 @@ by taking the inputs from the calculator and inserting them into objects and the
 > 1. What branch do you have your latest changes on?
     - **I don't know** - talk with an instructor
     - **not master**
-        - Create a pull request form most up to date branch to master (On **your** calculator repo)
+        - Create a pull request from most up to date branch to master (On **your** calculator repo)
         - Merge pull request to master
         - Go to Pull Latest Changes (step 2)
     - **master** - Go to Pull Latest Changes (step 2)
