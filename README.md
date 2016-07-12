@@ -5,28 +5,29 @@ Version 1 takes the layout and basic button click functionality built in the 2 p
 by taking the inputs from the calculator and inserting them into objects and then those objects into an array.
 
 ## Getting Started
-> - What branch do you have your latest changes on?
+> 1. What branch do you have your latest changes on?
     - **I don't know** - talk with an instructor
     - **not master**
-        - Create pull request form current branch to master
-        - Merge pull request on master
-        - Go to Pull Latest Changes
-    - **master** - Go to Pull Latest Changes
-> - Pull Latest Changes
-        - `git checkout master`
-        - `git pull origin master`
-> - Create the new feature branch
-    - `git checkout -b v1`
-> - Work on the scope defined <a href="https://github.com/Learning-Fuze/calculator/tree/v1#scope">Below</a>
-> - Add files to git
+        - Create a pull request form most up to date branch to master (On **your** calculator repo)
+        - Merge pull request to master
+        - Go to Pull Latest Changes (step 2)
+    - **master** - Go to Pull Latest Changes (step 2)
+1. Pull Latest Changes
+    - `git checkout master`
+    - `git pull origin master`
+    - *If you don't see your most recent code after pulling master refer to* **step 1**
+1. Create the new feature branch
+    - `git checkout -b version1`
+1. Work on the scope defined <a href="https://github.com/Learning-Fuze/calculator/tree/v1#scope">Below</a>
+1. Add files to git
     - `git add .`
-> - Commit files (Group files together)
-    - `git commit -m "calculator v1 - Your Name"`
+1. Commit files (Group files together)
+    - `git commit -m "calculator version1 - Your Name"`
     - **Replace "Your Name" with your first and last name**
-> - Send to gitHub (Push)
-    - `git push origin v1`
-> - Create pull request
-    - Pull request should be made from v1 to **your repository's/teams** master branch
+1. Send to gitHub (Push)
+    - `git push origin version1`
+1. Create pull request
+    - Pull request should be made from version1 to **your repository's/teams** master branch
 
 
 ## Scope
