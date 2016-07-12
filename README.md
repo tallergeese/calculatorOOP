@@ -5,28 +5,28 @@ Version 0.5 adds in user functionality without needing to write the underneath l
 to the calculator object the user can interact with the object to receive the values after calculation has been completed.
 
 ## Getting Started
-> - What branch do you have your latest changes on?
+> 1. What branch do you have your latest changes on?
     - **I don't know** - talk with an instructor
     - **not master**
-        - Create pull request form current branch to master
-        - Merge pull request on master
-        - Go to Pull Latest Changes
-    - **master** - Go to Pull Latest Changes
-> - Pull Latest Changes
-    - `git checkout version0.1`
-    - `git pull origin version0.1`
-    - *Your branch name may be slightly different, use which ever branch your 0.1 code is on*
-> - Create the new feature branch
+        - Create a pull request from most up to date branch to master (On **your** calculator repo)
+        - Merge pull request to master
+        - Go to Pull Latest Changes (*step 2*)
+    - **master** - Go to Pull Latest Changes (*step 2*)
+1. Pull Latest Changes
+    - `git checkout master`
+    - `git pull origin master`
+    - *if you don't see your most recent code after pulling master refer to* **step 1**
+1. Create the new feature branch
     - `git checkout -b version0.5`
-> - Work on the scope defined <a href="https://github.com/Learning-Fuze/calculator/tree/v.5#scope">Below</a>
-> - Add files to git
+1. Work on the scope defined <a href="https://github.com/Learning-Fuze/calculator/tree/v.5#scope">Below</a>
+1. Add files to git
     - `git add .`
-> - Commit files (Group files together)
+1. Commit files (Group files together)
     - `git commit -m "calculator v0.5 - Your Name"`
     - **Replace "Your Name" with your first and last name**
-> - Send to gitHub (Push)
+1. Send to gitHub (Push)
     - `git push origin version0.5`
-> - Create pull request
+1. Create pull request
     - Pull request should be made from version0.5 to **your repository's/teams** master branch
 
 
