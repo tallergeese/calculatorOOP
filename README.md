@@ -13,9 +13,11 @@ to the calculator object the user can interact with the object to receive the va
         - Go to Pull Latest Changes
     - **master** - Go to Pull Latest Changes
 > - Pull Latest Changes
-        - `git checkout v0.1`
+    - `git checkout version0.1`
+    - `git pull origin version0.1`
+    - *Your branch name may be slightly different, use which ever branch your 0.1 code is on*
 > - Create the new feature branch
-    - `git checkout -b v0.5`
+    - `git checkout -b version0.5`
 > - Work on the scope defined <a href="https://github.com/Learning-Fuze/calculator/tree/v.5#scope">Below</a>
 > - Add files to git
     - `git add .`
@@ -23,9 +25,9 @@ to the calculator object the user can interact with the object to receive the va
     - `git commit -m "calculator v0.5 - Your Name"`
     - **Replace "Your Name" with your first and last name**
 > - Send to gitHub (Push)
-    - `git push origin v0.5`
+    - `git push origin version0.5`
 > - Create pull request
-    - Pull request should be made from v0.5 to **your repository's/teams** master branch
+    - Pull request should be made from version0.5 to **your repository's/teams** master branch
 
 
 ## Scope
