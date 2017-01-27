@@ -18,7 +18,7 @@ var Calculator = function(){
 Calculator.prototype.takeKeyboardInput = function(){
     $(document).keypress(function(event){
 
-        console.log('key code pressed: ' +event.which + 'key pressed: ' + event.key);
+        console.log('key code pressed: ' +event.which + ' key pressed: ' + event.key);
 
         //checks for number and decimal input
         if (event.which == 46){
@@ -34,9 +34,13 @@ Calculator.prototype.takeKeyboardInput = function(){
 
         //checks for equal/enter input
         else if(event.which == 13){
+            if (newCalculation.inputArray[0] === '' && newCalculation.prevAnswerForSuccessiveOperations === undefined){
+                return;
+            }
             if(newCalculation.lastInputWasEqual){
                 newCalculation.successiveOperations();
-            }else{
+            }
+            else{
                 newCalculation.takeEquals(newCalculation.inputArray);
                 newCalculation.lastInputWasEqual = true;
             }
@@ -44,7 +48,6 @@ Calculator.prototype.takeKeyboardInput = function(){
 
         //checks for operator input
         else if (newCalculation.acceptedOperators.indexOf(event.key) > -1){
-
             if (newCalculation.lastInputWasEqual) {
                 newCalculation.lastInputWasEqual = false;
                 newCalculation.inputArray[0] = newCalculation.prevAnswerForSuccessiveOperations;
@@ -72,11 +75,17 @@ Calculator.prototype.takeNumber = function(number){
 };
 
 Calculator.prototype.takeOperator = function(operator){
+
+    if (this.inputArray[this.inputPointer] === ''){
+        return;
+    }
+
     //check for multiple operator input and constantly replace the operator with the latest one
     if (this.inputArray[this.inputPointer] === ''){
         this.inputArray[this.inputPointer - 1] = operator;
         return;
     }
+
     this.inputPointer++;
     this.inputArray[this.inputPointer] = operator;
     this.inputArray[++this.inputPointer] = '';
@@ -85,19 +94,22 @@ Calculator.prototype.takeOperator = function(operator){
 
 //this function will both detect the equal sign input and then identify and call the correct operation with the numbers passed as parameters
 Calculator.prototype.takeEquals = function(input){
+
+    //check to set up for successive operation vs new operation
     if (this.lastInputWasEqual){
         console.log('Buckle up, boys, we are going into successive operations.');
     }
     else{
         input = this.inputArray;
     }
+
     for (var i = 0; i < input.length ; i+=2){
         if (input[i] !== ''){
             input[i] = parseFloat(input[i]);
         }
     }
-    console.log('This is the parsed input: ' + input);
 
+    console.log('This is the parsed, cleaned input: ' + input);
 
     for (var j = 1, prevAnswer = input[j-1]; j < input.length;j+=2) {
         console.log('prevAnswer : '+ prevAnswer);
@@ -119,9 +131,19 @@ Calculator.prototype.takeEquals = function(input){
                 break;
             default:
                 console.log('ERROR');
+                this.resetCalculator();
+                return;
         }
     }
+
     this.prevAnswerForSuccessiveOperations = prevAnswer;
+
+    //rollover operation check
+    if (input[input.length-1] === ''){
+        this.rolloverOperation(input);
+        return;
+    }
+
     this.prevNumberAndOperation = input.splice(-2, 2);
     console.log('this is the last number and operator ' + this.prevNumberAndOperation + 'and this is the prevAnswerforSuccessiveOperations: ' + this.prevAnswerForSuccessiveOperations);
 
@@ -136,25 +158,56 @@ Calculator.prototype.successiveOperations = function(){
     this.takeEquals(successiveOperationCompleteArray);
 };
 
+Calculator.prototype.rolloverOperation = function (input){
+    console.log('this is what I am sending to rolloverOperation from takeEquals' + input);
+
+    var rolloverOperator = input[input.length-2];
+
+    console.log('this is the rolloverOperator ' + rolloverOperator);
+    input = [this.prevAnswerForSuccessiveOperations, rolloverOperator, this.prevAnswerForSuccessiveOperations];
+    console.log('this is what I am sending to takeEquals from rolloverOperation' + input);
+
+    this.lastInputWasEqual = true;
+
+    this.takeEquals(input);
+};
+
 //OPERATION FUNCTIONS
 Calculator.prototype.addition = function(num1, num2){
+    if (num2 === ''){
+        return num1;
+    }
     var sum = num1+num2;
     console.log('The sum of '+num1+ ' and '+num2+ ' is ' + sum);
     return sum;
 };
 
 Calculator.prototype.multiplication = function(num1,num2){
+    if (num2 === '') {
+        return num1;
+    }
     var product = num1*num2;
     console.log('The product of '+num1+ ' and '+num2+ ' is ' + product);
     return product;
 };
 
 Calculator.prototype.division = function(num1, num2){
+    if (num2 === '') {
+        return num1;
+    }
+    if (num2 == 0){
+        console.log('ERROR');
+        return "i can't let you destroy the universe";
+    }
+
     var quotient = num1/num2;
     console.log('The quotient of '+num1+ ' and '+num2+ ' is ' + quotient);
     return quotient;
 };
 Calculator.prototype.subtraction = function(num1,num2){
+    if (num2 === '') {
+        return num1;
+    }
     var difference = num1-num2;
     console.log('The difference of '+num1+ ' and '+num2+ ' is ' + difference);
     return difference;
