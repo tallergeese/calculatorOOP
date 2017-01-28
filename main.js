@@ -25,9 +25,10 @@ Calculator.prototype.takeKeyboardInput = function(){
             if (newCalculation.inputHasDecimal){
                 return;
             }
+            newCalculation.takeNumber(event.key);
             newCalculation.inputHasDecimal = true;
         }
-        if ((48 <= event.which && event.which <= 57) || (event.which >= 105 && event.which <=105 || event.which == 46)){
+        if ((48 <= event.which && event.which <= 57) || (event.which >= 105 && event.which <=105)){
             newCalculation.takeNumber(event.key);
             newCalculation.lastInputWasEqual = false;
         }
@@ -68,15 +69,12 @@ Calculator.prototype.resetCalculator = function(){
 
 //takeNumber also takes decimals
 Calculator.prototype.takeNumber = function(number){
-    if (this.hasDecimal){
-        return;
-    }
     this.inputArray[this.inputPointer] += number;
 };
 
 Calculator.prototype.takeOperator = function(operator){
 
-    if (this.inputArray[this.inputPointer] === ''){
+    if (this.inputArray[this.inputPointer] === '' && this.inputPointer === 0 ) {
         return;
     }
 
