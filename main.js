@@ -74,6 +74,9 @@ Calculator.prototype.takeNumber = function(number){
 
 Calculator.prototype.takeOperator = function(operator){
 
+    this.inputHasDecimal = false;
+
+
     if (this.inputArray[this.inputPointer] === '' && this.inputPointer === 0 ) {
         return;
     }
@@ -87,7 +90,6 @@ Calculator.prototype.takeOperator = function(operator){
     this.inputPointer++;
     this.inputArray[this.inputPointer] = operator;
     this.inputArray[++this.inputPointer] = '';
-    this.inputHasDecimal = false;
 };
 
 //this function will both detect the equal sign input and then identify and call the correct operation with the numbers passed as parameters
@@ -101,13 +103,7 @@ Calculator.prototype.takeEquals = function(input){
         input = this.inputArray;
     }
 
-    for (var i = 0; i < input.length ; i+=2){
-        if (input[i] !== ''){
-            input[i] = parseFloat(input[i]);
-        }
-    }
-
-    console.log('This is the parsed, cleaned input: ' + input);
+    input = this.parseInput(input);
 
     for (var j = 1, prevAnswer = input[j-1]; j < input.length;j+=2) {
         console.log('prevAnswer : '+ prevAnswer);
@@ -168,6 +164,18 @@ Calculator.prototype.rolloverOperation = function (input){
     this.lastInputWasEqual = true;
 
     this.takeEquals(input);
+};
+
+Calculator.prototype.parseInput = function (input){
+
+    for (var i = 0; i < input.length ; i+=2){
+        if (input[i] !== ''){
+            input[i] = parseFloat(input[i]);
+        }
+    }
+    console.log('This is the parsed, cleaned input: ' + input);
+    return input;
+
 };
 
 //OPERATION FUNCTIONS
