@@ -10,8 +10,8 @@ var Calculator = function(){
     this.inputHasDecimal = false;
     this.lastInputWasEqual = false;
 
-    //properties to enable operation repeats
-    this.prevAnswerForSuccessiveOperations;
+    //properties to enable operation repeats//rollovers
+    this.prevAnswerForSuccessiveOperations = null;
     this.prevNumberAndOperation = [];
 };
 
@@ -20,7 +20,7 @@ Calculator.prototype.takeKeyboardInput = function(){
 
         console.log('key code pressed: ' +event.which + ' key pressed: ' + event.key);
 
-        //checks for number and decimal input
+        //checks for decimal input
         if (event.which == 46){
             if (newCalculation.inputHasDecimal){
                 return;
@@ -28,8 +28,12 @@ Calculator.prototype.takeKeyboardInput = function(){
             newCalculation.takeNumber(event.key);
             newCalculation.inputHasDecimal = true;
         }
+        //checks for number input
         if ((48 <= event.which && event.which <= 57) || (event.which >= 105 && event.which <=105)){
             newCalculation.takeNumber(event.key);
+            if (newCalculation.lastInputWasEqual){
+                newCalculation.resetCalculator();
+            }
             newCalculation.lastInputWasEqual = false;
         }
 
@@ -58,12 +62,12 @@ Calculator.prototype.takeKeyboardInput = function(){
     })
 };
 
+//FUNCTIONS FOR CALCULATOR ENTRY/OPERATION BY USER
+
 Calculator.prototype.resetCalculator = function(){
     this.inputArray = [''];
     this.inputPointer = 0;
 };
-
-//FUNCTIONS FOR CALCULATOR ENTRY/OPERATION BY USER
 
 //takeNumber also takes decimals
 Calculator.prototype.takeNumber = function(number){
@@ -93,18 +97,43 @@ Calculator.prototype.takeOperator = function(operator){
 //this function will both detect the equal sign input and then identify and call the correct operation with the numbers passed as parameters
 Calculator.prototype.takeEquals = function(input){
 
-    //check to set up for successive operation vs new operation
+    //check to set up for successive/rollover operation vs new operation
     if (this.lastInputWasEqual){
         console.log('Buckle up, boys, we are going into successive operations.');
     }
     else{
         input = this.inputArray.slice(0, this.inputArray.length);
-        console.log('this is the inputArray' + this.inputArray);
-        console.log('this is the copy of inputArray' + input);
     }
 
     input = this.parseInput(input);
 
+    this.prevAnswerForSuccessiveOperations = this.doMath(input);
+
+    console.log('THIS IS THE ANSWER FOR THE OPERATION: ' + this.prevAnswerForSuccessiveOperations);
+
+    this.prevNumberAndOperation = this.inputArray.slice(this.inputArray.length-2, this.inputArray.length);
+    console.log('this is the last number and operator ' + this.prevNumberAndOperation + 'and this is the prevAnswerforSuccessiveOperations: ' + this.prevAnswerForSuccessiveOperations);
+
+    // //rollover operation check
+    // if (input[input.length-1] === ''){
+    //     this.rolloverOperation(input);
+    //     return;
+    // }
+};
+
+Calculator.prototype.parseInput = function (input){
+
+    for (var i = 0; i < input.length ; i+=2){
+        if (input[i] !== ''){
+            input[i] = parseFloat(input[i]);
+        }
+    }
+    console.log('This is the parsed, cleaned input: ' + input);
+    return input;
+
+};
+
+Calculator.prototype.doMath = function(input){
     var counter = 1;
     var prevAnswer = input[counter -1];
     while (counter < input.length){
@@ -137,26 +166,12 @@ Calculator.prototype.takeEquals = function(input){
                 break;
         }
     }
-
-    this.prevAnswerForSuccessiveOperations = prevAnswer;
-    this.prevNumberAndOperation = this.inputArray.slice(this.inputArray.length-2, this.inputArray.length);
-    console.log('this is the last number and operator ' + this.prevNumberAndOperation + 'and this is the prevAnswerforSuccessiveOperations: ' + this.prevAnswerForSuccessiveOperations);
-
-    //rollover operation check
-    if (input[input.length-1] === ''){
-        this.rolloverOperation(input);
-        return;
-    }
-
-    this.resetCalculator();
+    return prevAnswer;
 };
 
 Calculator.prototype.successiveOperations = function(){
     this.prevNumberAndOperation.unshift(this.prevAnswerForSuccessiveOperations);
-    var successiveOperationCompleteArray = this.prevNumberAndOperation;
-    console.log('this is the last number and operator in the successiveOperation ' + this.prevNumberAndOperation + 'and this is the prevAnswerforSuccessiveOperations: ' + this.prevAnswerForSuccessiveOperations);
-    console.log('this is the successiveOperationCompleteArray: ' + successiveOperationCompleteArray);
-    this.takeEquals(successiveOperationCompleteArray);
+    this.takeEquals(this.prevNumberAndOperation);
 };
 
 Calculator.prototype.rolloverOperation = function (input){
@@ -171,18 +186,6 @@ Calculator.prototype.rolloverOperation = function (input){
     this.lastInputWasEqual = true;
 
     this.takeEquals(input);
-};
-
-Calculator.prototype.parseInput = function (input){
-
-    for (var i = 0; i < input.length ; i+=2){
-        if (input[i] !== ''){
-            input[i] = parseFloat(input[i]);
-        }
-    }
-    console.log('This is the parsed, cleaned input: ' + input);
-    return input;
-
 };
 
 //OPERATION FUNCTIONS
@@ -225,6 +228,8 @@ Calculator.prototype.subtraction = function(num1,num2){
     console.log('The difference of '+num1+ ' and '+num2+ ' is ' + difference);
     return difference;
 };
+
+//CALL CALCULATOR OBJECT AND INITIALIZE APPLICATION
 
 var newCalculation;
 
