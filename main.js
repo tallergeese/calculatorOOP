@@ -63,9 +63,7 @@ Calculator.prototype.resetCalculator = function(){
     this.inputPointer = 0;
 };
 
-
 //FUNCTIONS FOR CALCULATOR ENTRY/OPERATION BY USER
-
 
 //takeNumber also takes decimals
 Calculator.prototype.takeNumber = function(number){
@@ -100,46 +98,55 @@ Calculator.prototype.takeEquals = function(input){
         console.log('Buckle up, boys, we are going into successive operations.');
     }
     else{
-        input = this.inputArray;
+        input = this.inputArray.slice(0, this.inputArray.length);
+        console.log('this is the inputArray' + this.inputArray);
+        console.log('this is the copy of inputArray' + input);
     }
 
     input = this.parseInput(input);
 
-    for (var j = 1, prevAnswer = input[j-1]; j < input.length;j+=2) {
-        console.log('prevAnswer : '+ prevAnswer);
-        switch (input[j]) {
-            case "+":
-                prevAnswer = this.addition(prevAnswer, input[j + 1]);
-                break;
+    var counter = 1;
+    var prevAnswer = input[counter -1];
+    while (counter < input.length){
+        switch (input[counter]){
             case 'x':
             case 'X':
             case '*':
-                prevAnswer = this.multiplication(prevAnswer, input[j + 1]);
+                prevAnswer = this.multiplication(input[counter-1], input[counter+1]);
+                input.splice(counter-1, 3, prevAnswer);
                 break;
             case '/':
             case '÷':
-                prevAnswer = this.division(prevAnswer, input[j + 1]);
-                break;
-            case '-':
-                prevAnswer = this.subtraction(prevAnswer, input[j + 1]);
+                prevAnswer = this.division(input[counter-1], input[counter+1]);
+                input.splice(counter-1, 3, prevAnswer);
                 break;
             default:
-                console.log('ERROR');
-                this.resetCalculator();
-                return;
+                counter +=2;
+        }
+    }
+
+    while (input.length > 1){
+        switch (input[1]){
+            case '+':
+                prevAnswer = this.addition(input[0], input[2]);
+                input.splice(0,3, prevAnswer);
+                break;
+            case '-':
+                prevAnswer = this.subtraction(input[0], input[2]);
+                input.splice(0,3, prevAnswer);
+                break;
         }
     }
 
     this.prevAnswerForSuccessiveOperations = prevAnswer;
+    this.prevNumberAndOperation = this.inputArray.slice(this.inputArray.length-2, this.inputArray.length);
+    console.log('this is the last number and operator ' + this.prevNumberAndOperation + 'and this is the prevAnswerforSuccessiveOperations: ' + this.prevAnswerForSuccessiveOperations);
 
     //rollover operation check
     if (input[input.length-1] === ''){
         this.rolloverOperation(input);
         return;
     }
-
-    this.prevNumberAndOperation = input.splice(-2, 2);
-    console.log('this is the last number and operator ' + this.prevNumberAndOperation + 'and this is the prevAnswerforSuccessiveOperations: ' + this.prevAnswerForSuccessiveOperations);
 
     this.resetCalculator();
 };
@@ -203,7 +210,7 @@ Calculator.prototype.division = function(num1, num2){
     }
     if (num2 == 0){
         console.log('ERROR');
-        return "i can't let you destroy the universe";
+        return "i can't let you do that";
     }
 
     var quotient = num1/num2;
