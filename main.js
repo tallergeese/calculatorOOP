@@ -39,7 +39,7 @@ Calculator.prototype.takeKeyboardInput = function(){
 
         //checks for equal/enter input
         else if(event.which == 13){
-            if (newCalculation.inputArray[0] === '' || typeof newCalculation.inputArray[0] === 'number'){
+            if (typeof newCalculation.inputArray[0] === 'string' && newCalculation.inputArray.length === 1){
                 return;
             }
             newCalculation.inputHasDecimal = false;
@@ -68,7 +68,8 @@ Calculator.prototype.takeKeyboardInput = function(){
             }
             newCalculation.takeOperator(event.key);
         }
-    })
+        newDisplay.userInputDisplay();
+    });
 };
 
 //FUNCTIONS FOR CALCULATOR ENTRY/OPERATION BY USER
@@ -239,9 +240,40 @@ Calculator.prototype.subtraction = function(num1,num2){
     return difference;
 };
 
+
+//DISPLAY CONSTRUCTOR
+var Display = function(){
+    this.getInputArray = function(){
+        var displayInputArray = newCalculation.inputArray.slice(0, newCalculation.inputArray.length);
+        console.log('getInputArray called and displaying this: ' + displayInputArray);
+        return displayInputArray;
+    };
+    this.displayInputArray;
+    this.getInputString = function(){
+        this.displayInputArray = this.getInputArray();
+        this.displayInputArray = this.displayInputArray.join();
+        this.displayInputArray = this.displayInputArray.replace(/,/g,'');
+        console.log(this.displayInputArray);
+        return this.displayInputArray;
+    };
+    this.userInputDisplay = function(){
+        $('.input-display').text(this.getInputString());
+        console.log('this.getInputString');
+    };
+    this.numberButtonHandlers = function (){
+        $('.number-button').click(function(){
+            console.log('this is the button being clicked ' + $(this).text());
+            return $('.number-button').text();
+        });
+    }
+};
+
 var newCalculation;
+var newDisplay;
 
 $(document).ready(function(){
     newCalculation = new Calculator();
     newCalculation.takeKeyboardInput();
+    newDisplay = new Display();
+    newDisplay.numberButtonHandlers();
 });
