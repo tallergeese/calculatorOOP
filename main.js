@@ -49,31 +49,32 @@ Calculator.prototype.takeOperator = function(operator){
 
 //this function will both detect the equal sign input and then identify and call the correct operation with the numbers passed as parameters
 Calculator.prototype.takeEquals = function(input){
-
+//LFZ START
     //check to set up for successive/rollover operation vs new operation
-    if (this.lastInputWasEqual){
-        console.log('Buckle up, boys, we are going into successive operations.');
-    }
-    else{
-        input = this.inputArray.slice(0, this.inputArray.length);
-    }
+        //check for bool this.lastInputwasEqual to see if we need to call successive operations function
+         //console log this is happening on a successive operation
+
+     // if lastInputWasEqual is false, we don't go to successive operations
+        //  make a whole copy of the user's input array, rather than using the array passed in as a parameter (which would generally be from a sucessive operation
+
 
     //parse the string (this one runs unnecessarily a lot...)
-    input = this.parseInput(input);
-    console.log('this.inputArray has been changed to current input: ' + this.inputArray);
+    //turn the strings into floats that we can do math on
+    //console log the array with parsed floats
 
     //prepare for possible rollover or repeating operations
-    this.prevNumberAndOperation = input.slice(input.length-2, input.length);
+    //create an array of the last operator and number of the current user input so that we can use it in a successive operation or rollover operation
 
     //finally do the math
-    this.prevAnswerForSuccessiveOperations = this.doMath(input);
-    this.inputArray = [this.prevAnswerForSuccessiveOperations];
-    this.inputPointer = 0;
-    console.log('THIS IS THE ANSWER FOR THE OPERATION: ' + this.prevAnswerForSuccessiveOperations);
+    //set this.prevAnswer to the calculation output done by doMath on the array in input
+    //set this.inputArray to the solution arrived at previously, so that we can combine it with this.prevAnswer for successive/rollover operations
+    // reset the pointer to the first spot, so that we can continue modifying the array without creating random array values of undefined
+    //console log the answer of the operation
 
-    console.log('this is the last number and operator ' + this.prevNumberAndOperation + 'and this is the prevAnswerforSuccessiveOperations: ' + this.prevAnswerForSuccessiveOperations);
+    // console log the last number and operator as well as the answer, which we can later join for successive operations
 
-    return this.prevAnswerForSuccessiveOperations;
+    //return the answer of the operation so that we can display it to the user via a different function
+    //LFZ END
 };
 
 Calculator.prototype.parseInput = function (input){
@@ -145,12 +146,14 @@ Calculator.prototype.rolloverOperation = function (input){
 
 //OPERATION FUNCTIONS
 Calculator.prototype.addition = function(num1, num2){
-    if (num2 === ''){
-        return num1;
-    }
-    var sum = num1+num2;
-    console.log('The sum of '+num1+ ' and '+num2+ ' is ' + sum);
-    return sum;
+    //LFZ START
+    //check if the second parameter passed to the addition function is an empty string, which would mean that the last actual entry in the array with a value is an operator
+    // don't do math on it so that we don't get an error doing math with an empty string-- the check for rollover operations happens elsewhere
+
+    // do the addition and set it to sum
+    // console log the operation and result
+    //return sum (usually to the takeEquals function) so that the answer can be added to this.prevAnswer and also be displayed
+    //LFZ END
 };
 
 Calculator.prototype.multiplication = function(num1,num2){
@@ -187,24 +190,25 @@ Calculator.prototype.subtraction = function(num1,num2){
 
 //DISPLAY CONSTRUCTOR
 var Display = function(){
-    this.getInputArray = function(){
-        var displayInputArray = newCalculation.inputArray.slice(0, newCalculation.inputArray.length);
-        console.log('getInputArray called and displaying this: ' + displayInputArray);
-        return displayInputArray;
-    };
-    this.displayInputArray;
-    this.getInputString = function(){
-        this.displayInputArray = this.getInputArray();
-        this.displayInputArray = this.displayInputArray.join();
-        this.displayInputArray = this.displayInputArray.replace(/,/g,'');
-        console.log(this.displayInputArray);
-        return this.displayInputArray;
-    };
-    this.userInputDisplay = function(){
-        $('.input-display').text(this.getInputString());
-        console.log(this.getInputString());
-    };
+    //LFZ START
+      //this gets the current inputArray from the Calculator object, which always holds the user input or answer depending on whether takeEquals has been called yet
+         // make a copy of the inputArray -- I probably could have just returned the inputArray directly, but I was originally thinking of making some readability changes to it. I also wanted it to have its own copy for a potential two-line display in future versions
+         // console logs the displayInputArray
+         //returns displayInputArray, which is just at this point a copy of inputArray in the Calculator object
 
+    //create a property to hold the eventual string that gets displayed to the user -- probably shouldn't be called displayInputArray
+    // this method is going to take the inputArray, turn it into a string, and remove all of the commas from the stringified array
+         //put a copy of the InputArray in displayInputArray
+         //turn the array into a string
+         //remove all of the commas from the stringified array. yay regex
+         //console log the string that will be displayed to the user
+         //return the string
+
+     //this function actually takes the string generated by getInputString and puts it on the DOM
+         //change the text of the display div to the output string from getInputString
+         //console log ths string that will be displayed to the user should be the same as the string currently in displayInputArray
+
+    //LFZ END
 };
 
 var InputTaker = function(){
@@ -247,69 +251,70 @@ var InputTaker = function(){
         }
         newDisplay.userInputDisplay();
     };
+    //LFZ START
+     //this function takes an event object from the click handlers and keypress handlers, determines whether they're numbers, operators, or equals, and sends them to the appropriate function to handle them. It also does a lot of the input sanitization and checks to prevent erroneous or problematic input.
 
-    this.sortInput= function(event){
-
-        console.log('key code pressed: ' +event.which + ' key pressed: ' + event.key);
+         //console log the .which and .key properties of the event object passed into the function
 
         //checks for decimal input
-        if (event.which == 46){
-            if (newCalculation.inputHasDecimal){
-                return;
-            }
-            newCalculation.takeNumber(event.key);
-            newCalculation.inputHasDecimal = true;
-        }
+         //checks for decimal input/keycode 46
+             //check if there is already a decimal somewhere in the current string in the current index of the array, e.g. ['123.4']
+                 //doesn't take input if there's already a decimal, since no real number has multiple decimals
+
+            //sends the decimal to the takeNumber function, which handles both numbers and decimals, since they get concatenated into the same strings
+            //sets the inputHasDecimal flag to true, since either the current number already had a decimal or just got one
+
         //checks for number input
-        if (48 <= event.which && event.which <= 57){
+         //checks if the key codes match up to numbers
             //a number after pressing equal means we're starting a new calculation, so we resetCalculator()
-            if (newCalculation.lastInputWasEqual){
-                newCalculation.resetCalculator();
-            }
-            newCalculation.takeNumber(event.key);
-            newCalculation.lastInputWasEqual = false;
-        }
+              //check if we just did an operation
+                  //a number after pressing equal means we're starting a new calculation, so we resetCalculator(),
+
+
+             //send the number to the takeNumber function, which will add the number input to the current string in the array
+            //if we're entering in a new number, then we're not going into successive or rollover operation
+
 
         //checks for equal/enter input
-        else if(event.which == 13){
+         //check the keycode of the event object for the Enter key
             //does nothing in the case of missing operations
-            if (typeof newCalculation.inputArray[0] === 'string' && newCalculation.inputArray.length === 1){
-                return;
-            }
-            newCalculation.inputHasDecimal = false;
+             //does nothing in the caes of missing operations (this covers having entered numbers and pressing Enter or just pressing Enter before anything else). this DOES NOT block successive operations, because the array will hold a value of type number, not string. It's only string in an empty array or via user input
+                 //do nothing with the user input
+
+            //if we press enter, that means we're completing an operation-- the next entry will either be an operator for rollover operations or a new number, which means we need to reset the decimal flag
 
             //does nothing in case equal/enter is being pressed prior to any other input-- if there's something in prevAnswer then that means we need to do repeat or rollover operation
-            if (newCalculation.inputArray[0] === '' && newCalculation.prevAnswerForSuccessiveOperations === undefined){
-                return;
-            }
+            //see above
+                 //see above
+
 
             //checks for rollover operation by determining whether the last two entries in the array correspond to what we would expect from having last entered an operator
-            if (newCalculation.acceptedOperators.indexOf(newCalculation.inputArray[newCalculation.inputArray.length-2]) > -1 && newCalculation.inputArray[newCalculation.inputArray.length-1] === ''){
-                console.log('going to rolloverOperations and this is the operator I see ' + newCalculation.inputArray[newCalculation.inputArray.length-2]);
-                newCalculation.rolloverOperation(newCalculation.inputArray);
-            }
-            else if(newCalculation.lastInputWasEqual){
-                newCalculation.successiveOperations();
-                newCalculation.lastInputWasEqual = true;
-            }
-            else{
-                newCalculation.takeEquals(newCalculation.inputArray);
-                newCalculation.lastInputWasEqual = true;
-            }
-        }
+             //checks that the last entry by the user was in fact an operator against the operator array
+                 //console logs the operator
+                //calls the rolloverOperation function which performs the rollover operation (e.g. 1+1+ = 4)
+
+             //if it's not invalid input, but lastInputWasEqual, do a successive operation (prevAnswer + prevNumberAndOperation);
+                 //call successive operations
+                 //set the lastinputwasequal to true
+
+             //else
+                 //call takeEquals to actually do the math if the user input gets through all of the above checks
+                 // set lastInputWasEqual to true, since we just completed an operation
+
+
 
         //checks for operator input against our array of operators
-        else if (newCalculation.acceptedOperators.indexOf(event.key) > -1){
+         //check for operator input against our array of operators
 
             //probably don't need this conditional and can just do the assignment to false...
-            if (newCalculation.lastInputWasEqual) {
-                newCalculation.lastInputWasEqual = false;
-            }
-            newCalculation.takeOperator(event.key);
-        }
-        newDisplay.userInputDisplay(); //updates the display after every input from the user regardless of type/content
-    };
+             //check if lastInputWasEqual
+                 //set it to false
 
+            // call the takeOperator function
+
+         //updates the display after every input from the user regardless of type/content
+
+    //LFZ END
     this.handleBackspace = function(){
         $(document).keyup(function(event){
             //checks for backspace input
