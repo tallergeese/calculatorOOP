@@ -15,63 +15,6 @@ var Calculator = function(){
     this.prevNumberAndOperation = [];
 };
 
-Calculator.prototype.takeKeyboardInput = function(){
-    $(document).keypress(function(event){
-
-        console.log('key code pressed: ' +event.which + ' key pressed: ' + event.key);
-
-        //checks for decimal input
-        if (event.which == 46){
-            if (newCalculation.inputHasDecimal){
-                return;
-            }
-            newCalculation.takeNumber(event.key);
-            newCalculation.inputHasDecimal = true;
-        }
-        //checks for number input
-        if (48 <= event.which && event.which <= 57){
-            if (newCalculation.lastInputWasEqual){
-                newCalculation.resetCalculator();
-            }
-            newCalculation.takeNumber(event.key);
-            newCalculation.lastInputWasEqual = false;
-        }
-
-        //checks for equal/enter input
-        else if(event.which == 13){
-            if (typeof newCalculation.inputArray[0] === 'string' && newCalculation.inputArray.length === 1){
-                return;
-            }
-            newCalculation.inputHasDecimal = false;
-
-            if (newCalculation.inputArray[0] === '' && newCalculation.prevAnswerForSuccessiveOperations === undefined){
-                return;
-            }
-            if (newCalculation.acceptedOperators.indexOf(newCalculation.inputArray[newCalculation.inputArray.length-2]) > -1 && newCalculation.inputArray[newCalculation.inputArray.length-1] === ''){
-                console.log('going to rolloverOperations and this is the operator I see ' + newCalculation.inputArray[newCalculation.inputArray.length-2]);
-                newCalculation.rolloverOperation(newCalculation.inputArray);
-            }
-            else if(newCalculation.lastInputWasEqual){
-                newCalculation.successiveOperations();
-                newCalculation.lastInputWasEqual = true;
-            }
-            else{
-                newCalculation.takeEquals(newCalculation.inputArray);
-                newCalculation.lastInputWasEqual = true;
-            }
-        }
-
-        //checks for operator input
-        else if (newCalculation.acceptedOperators.indexOf(event.key) > -1){
-            if (newCalculation.lastInputWasEqual) {
-                newCalculation.lastInputWasEqual = false;
-            }
-            newCalculation.takeOperator(event.key);
-        }
-        newDisplay.userInputDisplay();
-    });
-};
-
 //FUNCTIONS FOR CALCULATOR ENTRY/OPERATION BY USER
 
 Calculator.prototype.resetCalculator = function(){
@@ -258,22 +201,130 @@ var Display = function(){
     };
     this.userInputDisplay = function(){
         $('.input-display').text(this.getInputString());
-        console.log('this.getInputString');
+        console.log(this.getInputString());
     };
+
+};
+
+
+var InputTaker = function(){
     this.numberButtonHandlers = function (){
-        $('.number-button').click(function(){
+        $('.number-button, .operator').click(function() {
             console.log('this is the button being clicked ' + $(this).text());
-            return $('.number-button').text();
+
+            var event ={};
+            if ($(this).text() == '=') {
+                console.log('Equal was clicked.');
+                event = {
+                    which: 13
+                }
+            } else {
+                event = {
+                    key: $(this).text(),
+                    which: $(this).text().charCodeAt(0)
+                };
+            }
+            console.log('this is the button handler event', event);
+            userInput.sortInput(event);
         });
+    };
+
+    this.takeKeyboardInput = function() {
+        $(document).keypress(this.sortInput);
+    };
+
+    this.clearEntry = function(){
+        console.log('clearEntry is being run');
+        if (newCalculation.inputArray[newCalculation.inputArray.length-1] === '' && newCalculation.inputArray.length > 1){
+            newCalculation.inputArray.pop();
+            newCalculation.inputArray.pop();
+            newCalculation.inputPointer -= 2;
+        }
+        else {
+            newCalculation.inputArray[newCalculation.inputArray.length-1] = '';
+        }
+        newDisplay.userInputDisplay();
+    };
+
+    this.sortInput= function(event){
+
+        console.log('key code pressed: ' +event.which + ' key pressed: ' + event.key);
+
+        //checks for decimal input
+        if (event.which == 46){
+            if (newCalculation.inputHasDecimal){
+                return;
+            }
+            newCalculation.takeNumber(event.key);
+            newCalculation.inputHasDecimal = true;
+        }
+        //checks for number input
+        if (48 <= event.which && event.which <= 57){
+            if (newCalculation.lastInputWasEqual){
+                newCalculation.resetCalculator();
+            }
+            newCalculation.takeNumber(event.key);
+            newCalculation.lastInputWasEqual = false;
+        }
+
+        //checks for equal/enter input
+        else if(event.which == 13){
+            if (typeof newCalculation.inputArray[0] === 'string' && newCalculation.inputArray.length === 1){
+                return;
+            }
+            newCalculation.inputHasDecimal = false;
+
+            if (newCalculation.inputArray[0] === '' && newCalculation.prevAnswerForSuccessiveOperations === undefined){
+                return;
+            }
+            if (newCalculation.acceptedOperators.indexOf(newCalculation.inputArray[newCalculation.inputArray.length-2]) > -1 && newCalculation.inputArray[newCalculation.inputArray.length-1] === ''){
+                console.log('going to rolloverOperations and this is the operator I see ' + newCalculation.inputArray[newCalculation.inputArray.length-2]);
+                newCalculation.rolloverOperation(newCalculation.inputArray);
+            }
+            else if(newCalculation.lastInputWasEqual){
+                newCalculation.successiveOperations();
+                newCalculation.lastInputWasEqual = true;
+            }
+            else{
+                newCalculation.takeEquals(newCalculation.inputArray);
+                newCalculation.lastInputWasEqual = true;
+            }
+        }
+
+        //checks for operator input
+        else if (newCalculation.acceptedOperators.indexOf(event.key) > -1){
+            if (newCalculation.lastInputWasEqual) {
+                newCalculation.lastInputWasEqual = false;
+            }
+            newCalculation.takeOperator(event.key);
+        }
+        newDisplay.userInputDisplay();
+    };
+    this.handleBackspace = function(){
+        $(document).keyup(function(event){
+            //checks for backspace input
+            if (event.which === 8){
+                console.log('backspace was pressed');
+                userInput.clearEntry();
+            }
+        });
+        $('.clear-button').click(userInput.clearEntry);
+        $('.clear-all-button').click(function(){
+            newCalculation.resetCalculator();
+            newDisplay.userInputDisplay();
+        })
     }
 };
 
 var newCalculation;
 var newDisplay;
+var userInput;
 
 $(document).ready(function(){
     newCalculation = new Calculator();
-    newCalculation.takeKeyboardInput();
     newDisplay = new Display();
-    newDisplay.numberButtonHandlers();
+    userInput = new InputTaker();
+    userInput.numberButtonHandlers();
+    userInput.takeKeyboardInput();
+    userInput.handleBackspace();
 });
