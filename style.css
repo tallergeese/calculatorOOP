@@ -41,6 +41,7 @@ h2{
     margin: 0 auto;
     background-color:lightgray;
     text-align:right;
+    overflow: auto;
 }
 
 .input-display{

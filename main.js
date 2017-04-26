@@ -13,6 +13,9 @@ var Calculator = function(){
     //properties to enable operation repeats//rollovers
     this.prevAnswerForSuccessiveOperations = null;
     this.prevNumberAndOperation = [];
+
+    this.display = new Display(this);
+    this.userInput = new InputTaker(this);
 };
 
 //FUNCTIONS FOR CALCULATOR ENTRY/OPERATION BY USER
@@ -171,45 +174,45 @@ Calculator.prototype.subtraction = function(num1,num2){
 
 
 //DISPLAY CONSTRUCTOR
-var Display = function(){
+var Display = function(parent){
+    this.parent = parent;
     this.getInputArray = function(){
-        var displayInputArray = newCalculation.inputArray.slice(0, newCalculation.inputArray.length);
+        var displayInputArray = this.parent.inputArray.slice(0, this.parent.inputArray.length);
         return displayInputArray;
     };
     this.displayInputArray;
     this.getInputString = function(){
         this.displayInputArray = this.getInputArray();
+        console.log(this.displayInputArray)
         this.displayInputArray = this.displayInputArray.join();
         this.displayInputArray = this.displayInputArray.replace(/,/g,'');
-        console.log(this.displayInputArray);
+        console.log(this.displayInputArray)
         return this.displayInputArray;
     };
     this.userInputDisplay = function(){
+        console.log('this.getInputString', this.getInputString())
         $('.input-display').text(this.getInputString());
-        console.log(this.getInputString());
     };
 
 };
 
-var InputTaker = function(){
+var InputTaker = function(parent){
+    this.parent = parent;
     this.numberButtonHandlers = function (){
         $('.number-button, .operator').click(function() {
-
             //creating an event object to send to sortInput-- sortInput was originally written to only handle keypresses, so there's extensive use of event.which/event.key which we're simulating here
-            var event ={};
-            if ($(this).text() == '=') {
-                console.log('Equal was clicked.');
+            if ($(event.target).text() == '=') {
                 event = {
                     which: 13
                 }
             } else {
                 event = {
-                    key: $(this).text(),
-                    which: $(this).text().charCodeAt(0)
+                    key: $(event.target).text(),
+                    which: $(event.target).text().charCodeAt(0)
                 };
             }
-            userInput.sortInput(event);
-        });
+            this.sortInput(event);
+        }.bind(this, event));
     };
 
     this.takeKeyboardInput = function() {
@@ -218,103 +221,97 @@ var InputTaker = function(){
 
     this.clearEntry = function(){
         //operators create a value for themselves and an empty string, so two pops are necessary
-        if (newCalculation.inputArray[newCalculation.inputArray.length-1] === '' && newCalculation.inputArray.length > 1){
-            newCalculation.inputArray.pop();
-            newCalculation.inputArray.pop();
-            newCalculation.inputPointer -= 2;
+        if (this.parent.inputArray[this.parent.inputArray.length-1] === '' && this.parent.inputArray.length > 1){
+            this.parent.inputArray.pop();
+            this.parent.inputArray.pop();
+            this.parent.inputPointer -= 2;
         }
         else {
-            newCalculation.inputArray[newCalculation.inputArray.length-1] = '';
+            this.parent.inputArray[this.parent.inputArray.length-1] = '';
         }
-        newDisplay.userInputDisplay();
-    };
+        this.parent.display.userInputDisplay();
+    }.bind(this);
 
-    this.sortInput= function(event){
+    this.sortInput= function(){
 
         //checks for decimal input
         if (event.which == 46){
-            if (newCalculation.inputHasDecimal){
+            if (this.parent.inputHasDecimal){
                 return;
             }
-            newCalculation.takeNumber(event.key);
-            newCalculation.inputHasDecimal = true;
+            this.parent.takeNumber(event.key);
+            this.parent.inputHasDecimal = true;
         }
         //checks for number input
         if (48 <= event.which && event.which <= 57){
             //a number after pressing equal means we're starting a new calculation, so we resetCalculator()
-            if (newCalculation.lastInputWasEqual){
-                newCalculation.resetCalculator();
+            if (this.parent.lastInputWasEqual){
+                this.parent.resetCalculator();
             }
-            newCalculation.takeNumber(event.key);
-            newCalculation.lastInputWasEqual = false;
+            this.parent.takeNumber(event.key);
+            this.parent.lastInputWasEqual = false;
         }
 
         //checks for equal/enter input
         else if(event.which == 13){
             //does nothing in the case of missing operations
-            if (typeof newCalculation.inputArray[0] === 'string' && newCalculation.inputArray.length === 1){
+            if (typeof this.parent.inputArray[0] === 'string' && this.parent.inputArray.length === 1){
                 return;
             }
-            newCalculation.inputHasDecimal = false;
+            this.parent.inputHasDecimal = false;
 
             //does nothing in case equal/enter is being pressed prior to any other input-- if there's something in prevAnswer then that means we need to do repeat or rollover operation
-            if (newCalculation.inputArray[0] === '' && newCalculation.prevAnswerForSuccessiveOperations === undefined){
+            if (this.parent.inputArray[0] === '' && this.parent.prevAnswerForSuccessiveOperations === undefined){
                 return;
             }
 
             //checks for rollover operation by determining whether the last two entries in the array correspond to what we would expect from having last entered an operator
-            if (newCalculation.acceptedOperators.indexOf(newCalculation.inputArray[newCalculation.inputArray.length-2]) > -1 && newCalculation.inputArray[newCalculation.inputArray.length-1] === ''){
-                newCalculation.rolloverOperation(newCalculation.inputArray);
+            if (this.parent.acceptedOperators.indexOf(this.parent.inputArray[this.parent.inputArray.length-2]) > -1 && this.parent.inputArray[this.parent.inputArray.length-1] === ''){
+                this.parent.rolloverOperation(this.parent.inputArray);
             }
-            else if(newCalculation.lastInputWasEqual){
-                newCalculation.successiveOperations();
-                newCalculation.lastInputWasEqual = true;
+            else if(this.parent.lastInputWasEqual){
+                this.parent.successiveOperations();
+                this.parent.lastInputWasEqual = true;
             }
             else{
-                newCalculation.takeEquals(newCalculation.inputArray);
-                newCalculation.lastInputWasEqual = true;
+                this.parent.takeEquals(this.parent.inputArray);
+                this.parent.lastInputWasEqual = true;
             }
         }
 
         //checks for operator input against our array of operators
-        else if (newCalculation.acceptedOperators.indexOf(event.key) > -1){
+        else if (this.parent.acceptedOperators.indexOf(event.key) > -1){
 
             //probably don't need this conditional and can just do the assignment to false...
-            if (newCalculation.lastInputWasEqual) {
-                newCalculation.lastInputWasEqual = false;
+            if (this.parent.lastInputWasEqual) {
+                this.parent.lastInputWasEqual = false;
             }
-            newCalculation.takeOperator(event.key);
+            this.parent.takeOperator(event.key);
         }
-        newDisplay.userInputDisplay(); //updates the display after every input from the user regardless of type/content
-    };
+        this.parent.display.userInputDisplay(); //updates the display after every input from the user regardless of type/content
+    }.bind(this);
 
     this.handleBackspace = function(){
-        $(document).keyup(function(event){
+        $(document).keyup(function(){
             //checks for backspace input
             if (event.which === 8){
-                userInput.clearEntry();
-            }
-        });
-        $('.clear-button').click(userInput.clearEntry);
+                this.clearEntry();
+            }   
+        }.bind(this, event));
+        $('.clear-button').click(this.clearEntry);
         $('.clear-all-button').click(function(){
-            newCalculation.resetCalculator();
-            newDisplay.userInputDisplay();
-        })
+            this.parent.resetCalculator();
+            this.parent.display.userInputDisplay();
+        }.bind(this))
     };
     this.initializeHandlers = function(){
         this.takeKeyboardInput();
         this.numberButtonHandlers();
         this.handleBackspace();
     };
+    this.initializeHandlers();
 };
 
-var newCalculation;
-var newDisplay;
-var userInput;
-
 $(document).ready(function(){
-    newCalculation = new Calculator();
-    newDisplay = new Display();
-    userInput = new InputTaker();
-    userInput.initializeHandlers();
+    var calculator = new Calculator();
 });
