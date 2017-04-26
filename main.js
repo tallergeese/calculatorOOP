@@ -183,14 +183,12 @@ var Display = function(parent){
     this.displayInputArray;
     this.getInputString = function(){
         this.displayInputArray = this.getInputArray();
-        console.log(this.displayInputArray)
         this.displayInputArray = this.displayInputArray.join();
         this.displayInputArray = this.displayInputArray.replace(/,/g,'');
-        console.log(this.displayInputArray)
+        cnsole.log(this.displayInputArray)
         return this.displayInputArray;
     };
     this.userInputDisplay = function(){
-        console.log('this.getInputString', this.getInputString())
         $('.input-display').text(this.getInputString());
     };
 
