@@ -51,16 +51,12 @@ Calculator.prototype.takeOperator = function(operator){
 Calculator.prototype.takeEquals = function(input){
 
     //check to set up for successive/rollover operation vs new operation
-    if (this.lastInputWasEqual){
-        console.log('Buckle up, boys, we are going into successive operations.');
-    }
-    else{
+    if (!this.lastInputWasEqual){
         input = this.inputArray.slice(0, this.inputArray.length);
     }
 
     //parse the string (this one runs unnecessarily a lot...)
     input = this.parseInput(input);
-    console.log('this.inputArray has been changed to current input: ' + this.inputArray);
 
     //prepare for possible rollover or repeating operations
     this.prevNumberAndOperation = input.slice(input.length-2, input.length);
@@ -69,9 +65,6 @@ Calculator.prototype.takeEquals = function(input){
     this.prevAnswerForSuccessiveOperations = this.doMath(input);
     this.inputArray = [this.prevAnswerForSuccessiveOperations];
     this.inputPointer = 0;
-    console.log('THIS IS THE ANSWER FOR THE OPERATION: ' + this.prevAnswerForSuccessiveOperations);
-
-    console.log('this is the last number and operator ' + this.prevNumberAndOperation + 'and this is the prevAnswerforSuccessiveOperations: ' + this.prevAnswerForSuccessiveOperations);
 
     return this.prevAnswerForSuccessiveOperations;
 };
@@ -83,7 +76,6 @@ Calculator.prototype.parseInput = function (input){
             input[i] = parseFloat(input[i]);
         }
     }
-    console.log('This is the parsed, cleaned input: ' + input);
     return input;
 
 };
@@ -135,8 +127,6 @@ Calculator.prototype.rolloverOperation = function (input){
     input.pop();
     var rolloverOperator = input.pop();
 
-    console.log('this is what I am sending to takeEquals from rolloverOperation' + input);
-
     this.lastInputWasEqual = true;  //needs to be true so that this.inputArray won't be reassigned in takeEquals()
     var tempAnswer = this.takeEquals(input);
     input = [tempAnswer, rolloverOperator, tempAnswer];
@@ -149,7 +139,6 @@ Calculator.prototype.addition = function(num1, num2){
         return num1;
     }
     var sum = num1+num2;
-    console.log('The sum of '+num1+ ' and '+num2+ ' is ' + sum);
     return sum;
 };
 
@@ -158,7 +147,6 @@ Calculator.prototype.multiplication = function(num1,num2){
         return num1;
     }
     var product = num1*num2;
-    console.log('The product of '+num1+ ' and '+num2+ ' is ' + product);
     return product;
 };
 
@@ -167,12 +155,10 @@ Calculator.prototype.division = function(num1, num2){
         return num1;
     }
     if (num2 == 0){
-        console.log('ERROR');
         return "i can't let you do that";
     }
 
     var quotient = num1/num2;
-    console.log('The quotient of '+num1+ ' and '+num2+ ' is ' + quotient);
     return quotient;
 };
 Calculator.prototype.subtraction = function(num1,num2){
@@ -180,7 +166,6 @@ Calculator.prototype.subtraction = function(num1,num2){
         return num1;
     }
     var difference = num1-num2;
-    console.log('The difference of '+num1+ ' and '+num2+ ' is ' + difference);
     return difference;
 };
 
@@ -189,7 +174,6 @@ Calculator.prototype.subtraction = function(num1,num2){
 var Display = function(){
     this.getInputArray = function(){
         var displayInputArray = newCalculation.inputArray.slice(0, newCalculation.inputArray.length);
-        console.log('getInputArray called and displaying this: ' + displayInputArray);
         return displayInputArray;
     };
     this.displayInputArray;
@@ -210,7 +194,6 @@ var Display = function(){
 var InputTaker = function(){
     this.numberButtonHandlers = function (){
         $('.number-button, .operator').click(function() {
-            console.log('this is the button being clicked ' + $(this).text());
 
             //creating an event object to send to sortInput-- sortInput was originally written to only handle keypresses, so there's extensive use of event.which/event.key which we're simulating here
             var event ={};
@@ -225,7 +208,6 @@ var InputTaker = function(){
                     which: $(this).text().charCodeAt(0)
                 };
             }
-            console.log('this is the button handler event', event);
             userInput.sortInput(event);
         });
     };
@@ -235,7 +217,6 @@ var InputTaker = function(){
     };
 
     this.clearEntry = function(){
-        console.log('clearEntry is being run');
         //operators create a value for themselves and an empty string, so two pops are necessary
         if (newCalculation.inputArray[newCalculation.inputArray.length-1] === '' && newCalculation.inputArray.length > 1){
             newCalculation.inputArray.pop();
@@ -249,8 +230,6 @@ var InputTaker = function(){
     };
 
     this.sortInput= function(event){
-
-        console.log('key code pressed: ' +event.which + ' key pressed: ' + event.key);
 
         //checks for decimal input
         if (event.which == 46){
@@ -285,7 +264,6 @@ var InputTaker = function(){
 
             //checks for rollover operation by determining whether the last two entries in the array correspond to what we would expect from having last entered an operator
             if (newCalculation.acceptedOperators.indexOf(newCalculation.inputArray[newCalculation.inputArray.length-2]) > -1 && newCalculation.inputArray[newCalculation.inputArray.length-1] === ''){
-                console.log('going to rolloverOperations and this is the operator I see ' + newCalculation.inputArray[newCalculation.inputArray.length-2]);
                 newCalculation.rolloverOperation(newCalculation.inputArray);
             }
             else if(newCalculation.lastInputWasEqual){
@@ -314,7 +292,6 @@ var InputTaker = function(){
         $(document).keyup(function(event){
             //checks for backspace input
             if (event.which === 8){
-                console.log('backspace was pressed');
                 userInput.clearEntry();
             }
         });
